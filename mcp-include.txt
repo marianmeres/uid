@@ -1,0 +1,6 @@
+Unique id generator exposing one uid(strategy, options) function plus tree-shakeable
+named exports. Crypto-backed, zero-dependency strategies for UUID v4/v7, ULID, nanoid,
+base56/base58/base62/base36/base32/hex/numeric random strings (coupon/OTP codes),
+reversible uuid<->base56 encoding, in-memory prefixed counters, and reversible integer
+codecs (hashids-style). Includes an opt-in human-readable strategy and works in
+browsers, Deno, Node, and Bun.

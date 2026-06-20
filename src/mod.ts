@@ -6,10 +6,14 @@
  * keep its word lists out of the core bundle.
  *
  * @example
+ * ```ts
  * import { uid, nanoid, uuidv7 } from "@marianmeres/uid";
  * uid();                         // uuid v4
  * nanoid(12);                    // tree-shakeable named export
  * uid("uuidv7");                 // sortable database key
+ * ```
+ *
+ * @module
  */
 
 export * from "./random.ts";

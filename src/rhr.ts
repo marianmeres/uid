@@ -14,6 +14,8 @@
  * import { rhr } from "@marianmeres/uid/rhr";
  * rhr({ nounsCount: 1 });
  * ```
+ *
+ * @module
  */
 
 import { getRandomHumanReadable } from "@marianmeres/random-human-readable";

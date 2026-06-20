@@ -78,13 +78,21 @@ export interface ReversibleOptions {
  * subset of `@marianmeres/random-human-readable` options that yield a string.
  */
 export interface RhrOptions {
+	/** Number of adjectives (default: 1). */
 	adjCount?: number;
+	/** Number of color names (default: 1). */
 	colorsCount?: number;
+	/** Number of nouns (default: 2). */
 	nounsCount?: number;
+	/** Number of nonsense CV syllables to append (default: 0). */
 	syllablesCount?: number;
+	/** Number of random digits to append (default: 0). */
 	digitsCount?: number;
+	/** Number of special characters to append (default: 0). */
 	specialCharsCount?: number;
+	/** Randomize letter casing (default: false). */
 	randomizeCase?: boolean;
+	/** Separator between parts (default: "-"). */
 	joinWith?: string;
 }
 
@@ -152,19 +160,30 @@ registerStrategy("reversible", (o = {}) => {
 
 // ── Dispatcher ───────────────────────────────────────────────────────────────
 
+/** Generates a UUID v4 — the default strategy. */
 export function uid(strategy?: "uuid" | "uuidv4", options?: UuidOptions): string;
+/** Generates a time-sortable UUID v7. */
 export function uid(strategy: "uuidv7", options?: Uuidv7Options): string;
+/** Generates a time-sortable ULID (Crockford base32). */
 export function uid(strategy: "ulid", options?: UlidOptions): string;
+/** Generates a random base56 string, or reversibly encodes `options.uuid`. */
 export function uid(strategy: "base56", options?: Base56Options): string;
+/** Generates a URL-safe nanoid-style id. */
 export function uid(strategy: "nanoid", options?: NanoidOptions): string;
+/** Generates a random string over a named alphabet. */
 export function uid(
 	strategy: "hex" | "base32" | "base36" | "base58" | "base62" | "numeric",
 	options?: AlphabetOptions,
 ): string;
+/** Generates a random string over a custom `options.alphabet`. */
 export function uid(strategy: "custom", options: CustomOptions): string;
+/** Returns the next value of an in-memory, per-prefix counter. */
 export function uid(strategy: "counter", options?: CounterOptions): string;
+/** Reversibly encodes `options.value` into a short string. */
 export function uid(strategy: "reversible", options: ReversibleOptions): string;
+/** Generates a human-readable id (requires `import "@marianmeres/uid/rhr"`). */
 export function uid(strategy: "rhr", options?: RhrOptions): string;
+/** Generates an id using any registered strategy, looked up by name. */
 export function uid(strategy: string, options?: Record<string, unknown>): string;
 /**
  * Generates a unique id using the named `strategy`.

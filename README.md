@@ -174,6 +174,21 @@ out-of-range UUID v7 / ULID timestamps, missing required options (`custom`'s
 `alphabet`, `reversible`'s `value`), duplicate reversible alphabets, and invalid
 counter options all throw `TypeError` / `RangeError`.
 
+## Interactive example
+
+[`example/`](example/) is a single-page playground for every strategy: edit the
+options, watch the `uid()` call update to the minimal code that reproduces the
+result, and copy any generated id with one tap. Run it locally with:
+
+```bash
+deno task example:build   # bundle example/src/app.ts -> example/dist/bundle.js
+deno task example:serve   # http://localhost:8000
+```
+
+Use `deno task example:watch` while editing, and `deno task example:themes` to
+regenerate the stylesheet from a different
+[`@marianmeres/design-tokens`](https://jsr.io/@marianmeres/design-tokens) theme.
+
 ## API
 
 See [API.md](API.md) for the complete API reference.

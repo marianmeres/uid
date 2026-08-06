@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+		/>
+		<title>@marianmeres/uid — every strategy, live</title>
+		<meta
+			name="description"
+			content="Interactive playground for @marianmeres/uid — uuid, uuidv7, ulid, nanoid, base56/58/62, counters, reversible integer codes and human-readable ids. Tweak the options, generate, copy."
+		/>
+		<link
+			rel="icon"
+			href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%2210 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🆔</text></svg>"
+		/>
+
+		<!--
+			Styling is @marianmeres/design-tokens with the Bootstrap Reboot bridge:
+			  · reboot.css       — element-level normalize/reset (consumes --bs-*)
+			  · themes/theme.css — one bundled design-tokens theme, run through the
+			                       reboot bridge. Sets the --app-color-* tokens AND
+			                       the --bs-* variables; light on :root, dark on
+			                       :root.dark. Regenerate (or swap the theme) with:
+			                         deno task example:themes
+			  · the block below  — the example's own layout, tokens only, no framework.
+		-->
+		<link rel="stylesheet" href="./reboot.css" />
+		<link rel="stylesheet" href="./themes/theme.css" />
+
+		<!-- Anti-FOUC: settle light/dark before first paint. Key matches THEME_KEY. -->
+		<script>
+		try {
+			var saved = localStorage.getItem("uid-example-dark");
+			var dark = saved !== null
+				? saved === "1"
+				: matchMedia("(prefers-color-scheme: dark)").matches;
+			document.documentElement.classList.toggle("dark", dark);
+		} catch (e) {}
+		</script>
+
+		<style>
+		:root {
+			color-scheme: light;
+		}
+		:root.dark {
+			color-scheme: dark;
+		}
+
+		body {
+			min-height: 100dvh;
+			-webkit-text-size-adjust: 100%;
+		}
+
+		.wrap {
+			max-width: 68rem;
+			margin: 0 auto;
+			padding: 1.25rem max(1rem, env(safe-area-inset-right)) 3rem
+				max(1rem, env(safe-area-inset-left));
+		}
+
+		/* ── Buttons ───────────────────────────────────────────────────── */
+		.btn {
+			font: inherit;
+			font-size: 0.85rem;
+			min-height: 2.5rem;
+			padding: 0 0.85rem;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: 0.35rem;
+			border: 1px solid var(--app-color-border);
+			border-radius: 0.5rem;
+			background: var(--app-color-surface);
+			color: var(--app-color-surface-foreground);
+			white-space: nowrap;
+			cursor: pointer;
+			touch-action: manipulation;
+		}
+		.btn:hover {
+			background: var(--app-color-surface-hover);
+		}
+		.btn-primary {
+			border-color: transparent;
+			background: var(--app-color-primary);
+			color: var(--app-color-primary-foreground);
+			font-weight: 600;
+		}
+		.btn-primary:hover {
+			background: var(--app-color-primary-hover);
+		}
+		.btn-ghost {
+			border-color: transparent;
+			background: transparent;
+			color: var(--app-color-muted-foreground);
+		}
+		.btn-icon {
+			width: 2.5rem;
+			padding: 0;
+			font-size: 1rem;
+		}
+		:where(.btn, .out, input, select):focus-visible {
+			outline: 2px solid var(--app-color-primary);
+			outline-offset: 2px;
+		}
+
+		/* ── Top bar ───────────────────────────────────────────────────── */
+		.topbar {
+			position: sticky;
+			top: 0;
+			z-index: 10;
+			background: var(--app-color-background);
+			border-bottom: 1px solid var(--app-color-border);
+			padding-top: env(safe-area-inset-top);
+		}
+		.topbar-inner {
+			max-width: 68rem;
+			margin: 0 auto;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			padding: 0.6rem max(1rem, env(safe-area-inset-right)) 0.6rem
+				max(1rem, env(safe-area-inset-left));
+		}
+		.brand {
+			font-weight: 700;
+			font-size: 0.95rem;
+			color: inherit;
+			text-decoration: none;
+			margin-right: auto;
+			min-width: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+		.brand .scope {
+			color: var(--app-color-muted-foreground);
+			font-weight: 400;
+		}
+
+		/* ── Intro ─────────────────────────────────────────────────────── */
+		.lead {
+			max-width: 60ch;
+			margin: 0 0 0.6rem;
+			color: var(--app-color-muted-foreground);
+			font-size: 0.92rem;
+		}
+		.lead code {
+			color: var(--app-color-foreground);
+		}
+		.warn {
+			max-width: 60ch;
+			margin: 0 0 1.5rem;
+			padding: 0.6rem 0.8rem;
+			border: 1px solid var(--app-color-surface-warning-border);
+			border-radius: 0.5rem;
+			background: var(--app-color-surface-warning);
+			color: var(--app-color-surface-warning-foreground);
+			font-size: 0.82rem;
+		}
+
+		/* ── Card grid ─────────────────────────────────────────────────── */
+		.cards {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+			align-items: start;
+			gap: 1rem;
+		}
+		.card {
+			display: flex;
+			flex-direction: column;
+			gap: 0.7rem;
+			padding: 1rem;
+			border: 1px solid var(--app-color-border);
+			border-radius: 0.75rem;
+			background: var(--app-color-surface);
+			color: var(--app-color-surface-foreground);
+		}
+		.card-title {
+			margin: 0;
+			font-size: 1rem;
+			font-weight: 700;
+			font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+		}
+		.card-blurb,
+		.card-note {
+			margin: -0.35rem 0 0;
+			font-size: 0.8rem;
+			line-height: 1.5;
+			color: var(--app-color-muted-foreground);
+		}
+		/* Prose footnotes and, on the alphabet cards, the alphabet itself —
+		   so it is stated once instead of repeated on every result row. */
+		.card-note {
+			margin: 0;
+			font-size: 0.72rem;
+			overflow-wrap: anywhere;
+		}
+
+		/* ── Fields ────────────────────────────────────────────────────── */
+		.fields {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+			gap: 0.55rem;
+		}
+		.field {
+			display: flex;
+			flex-direction: column;
+			gap: 0.2rem;
+			min-width: 0;
+		}
+		.field.is-wide {
+			grid-column: 1 / -1;
+		}
+		.field-label {
+			font-size: 0.7rem;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			color: var(--app-color-muted-foreground);
+		}
+		.field-hint {
+			font-size: 0.68rem;
+			color: var(--app-color-muted-foreground);
+		}
+		.field input,
+		.field select {
+			font: inherit;
+			/* 1rem = 16px keeps iOS Safari from zooming the page on focus */
+			font-size: 1rem;
+			min-height: 2.5rem;
+			width: 100%;
+			min-width: 0;
+			padding: 0 0.55rem;
+			border: 1px solid var(--app-color-border);
+			border-radius: 0.45rem;
+			background: var(--app-color-input);
+			color: var(--app-color-foreground);
+		}
+		.field-check {
+			flex-direction: row;
+			align-items: center;
+			gap: 0.45rem;
+			min-height: 2.5rem;
+		}
+		.field-check input {
+			width: 1.15rem;
+			height: 1.15rem;
+			min-height: 0;
+			flex: none;
+			accent-color: var(--app-color-primary);
+		}
+		.field-check .field-label {
+			text-transform: none;
+			letter-spacing: 0;
+			font-size: 0.8rem;
+		}
+
+		/* ── Live code snippet ─────────────────────────────────────────── */
+		.snippet {
+			display: block;
+			padding: 0.5rem 0.6rem;
+			border-radius: 0.45rem;
+			background: var(--app-color-muted);
+			color: var(--app-color-muted-foreground);
+			font-size: 0.78rem;
+			line-height: 1.5;
+			white-space: pre-wrap;
+			overflow-wrap: anywhere;
+		}
+
+		.card-actions {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.4rem;
+		}
+
+		/* ── Results ───────────────────────────────────────────────────── */
+		.outputs {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			display: grid;
+			gap: 0.35rem;
+		}
+		.outputs-empty {
+			margin: 0;
+			font-size: 0.8rem;
+			color: var(--app-color-muted-foreground);
+		}
+		.out {
+			font: inherit;
+			display: block;
+			width: 100%;
+			text-align: left;
+			position: relative;
+			padding: 0.55rem 4.2rem 0.55rem 0.6rem;
+			border: 1px solid var(--app-color-border);
+			border-radius: 0.45rem;
+			background: var(--app-color-background);
+			color: var(--app-color-foreground);
+			cursor: pointer;
+			touch-action: manipulation;
+		}
+		.out:hover {
+			border-color: var(--app-color-primary);
+		}
+		.is-latest .out {
+			border-color: var(--app-color-surface-accent-border);
+			background: var(--app-color-surface-accent);
+			color: var(--app-color-surface-accent-foreground);
+		}
+		.out-value {
+			display: block;
+			font-size: 0.85rem;
+			line-height: 1.45;
+			color: inherit;
+			overflow-wrap: anywhere;
+		}
+		.out-meta {
+			display: block;
+			margin-top: 0.15rem;
+			font-size: 0.7rem;
+			line-height: 1.4;
+			opacity: 0.75;
+			overflow-wrap: anywhere;
+		}
+		.out-badge {
+			position: absolute;
+			top: 0.5rem;
+			right: 0.5rem;
+			font-size: 0.65rem;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			padding: 0.15rem 0.35rem;
+			border-radius: 0.25rem;
+			background: var(--app-color-muted);
+			color: var(--app-color-muted-foreground);
+		}
+		.out[data-copied="yes"] .out-badge {
+			background: var(--app-color-success);
+			color: var(--app-color-success-foreground);
+		}
+		.out[data-copied="no"] .out-badge {
+			background: var(--app-color-warning);
+			color: var(--app-color-warning-foreground);
+		}
+		.out-error {
+			margin: 0;
+			padding: 0.55rem 0.6rem;
+			border: 1px solid var(--app-color-surface-destructive-border);
+			border-radius: 0.45rem;
+			background: var(--app-color-surface-destructive);
+			color: var(--app-color-surface-destructive-foreground);
+			font-size: 0.78rem;
+			line-height: 1.45;
+			overflow-wrap: anywhere;
+		}
+
+		/* ── Footer ────────────────────────────────────────────────────── */
+		.page-footer {
+			margin-top: 2rem;
+			padding-top: 1rem;
+			border-top: 1px solid var(--app-color-border);
+			font-size: 0.78rem;
+			line-height: 1.7;
+			color: var(--app-color-muted-foreground);
+		}
+
+		@media (max-width: 30rem) {
+			.brand .scope {
+				display: none;
+			}
+		}
+		@media (prefers-reduced-motion: no-preference) {
+			.out,
+			.btn {
+				transition: background-color 0.15s, border-color 0.15s;
+			}
+		}
+		</style>
+	</head>
+	<body>
+		<header class="topbar">
+			<div class="topbar-inner">
+				<a class="brand" href="https://jsr.io/@marianmeres/uid">
+					<span class="scope">@marianmeres/</span>uid
+				</a>
+				<button type="button" class="btn btn-primary" id="generate-all">
+					Generate all
+				</button>
+				<button type="button" class="btn btn-ghost" id="clear-all">Clear</button>
+				<button
+					type="button"
+					class="btn btn-icon"
+					id="dark-toggle"
+					aria-pressed="false"
+					aria-label="Toggle dark mode"
+				>◐</button>
+			</div>
+		</header>
+
+		<main class="wrap">
+			<p class="lead">
+				Every strategy the library ships, live. Tweak the options — the
+				<code>uid()</code> call shown on each card is the exact one being made —
+				then tap any result to copy it.
+			</p>
+			<p class="warn">
+				Good-quality randomness (Web Crypto, rejection-sampled), but
+				<strong>not</strong> for cryptographic secrets — tokens, keys, password
+				resets. Use a dedicated crypto routine for those.
+			</p>
+
+			<div class="cards" id="cards"></div>
+
+			<footer class="page-footer">
+				<a href="https://jsr.io/@marianmeres/uid">JSR</a> ·
+				<a href="https://www.npmjs.com/package/@marianmeres/uid">npm</a> ·
+				<a href="https://github.com/marianmeres/uid">GitHub</a><br />
+				Built with
+				<a href="https://jsr.io/@marianmeres/vanilla">@marianmeres/vanilla</a>,
+				<a href="https://jsr.io/@marianmeres/design-tokens">design-tokens</a> and
+				<a href="https://jsr.io/@marianmeres/deno-build">deno-build</a>.
+			</footer>
+		</main>
+
+		<!-- ================================================================
+		     TEMPLATES — all markup lives here; app.ts only clones and fills.
+		     ================================================================ -->
+
+		<template id="tpl-card">
+			<article class="card">
+				<h2 class="card-title" data-ref="title"></h2>
+				<p class="card-blurb" data-ref="blurb"></p>
+				<div class="fields" data-ref="fields"></div>
+				<p class="card-note" data-ref="note" hidden></p>
+				<code class="snippet" data-ref="snippet"></code>
+				<div class="card-actions">
+					<button type="button" class="btn btn-primary"
+						data-on="click:generate">
+						Generate
+					</button>
+					<button
+						type="button"
+						class="btn"
+						data-ref="actionBtn"
+						data-on="click:action"
+					></button>
+					<button
+						type="button"
+						class="btn btn-ghost"
+						data-ref="clearBtn"
+						data-on="click:clear"
+						hidden
+					>Clear</button>
+				</div>
+				<ul class="outputs" data-ref="outputs"></ul>
+				<p class="outputs-empty" data-ref="empty"
+					hidden>Nothing generated yet.</p>
+			</article>
+		</template>
+
+		<!-- One result. The whole row is the copy button — a comfortable tap
+		     target on a phone, and keyboard-reachable on a desktop. -->
+		<template id="tpl-output">
+			<li>
+				<button type="button" class="out" data-on="click:copy" title="Copy">
+					<code class="out-value" data-ref="value"
+						data-bind="text:value"></code>
+					<span class="out-meta" data-bind="text:meta; hidden:noMeta"></span>
+					<span class="out-badge" data-ref="badge"
+						aria-hidden="true">copy</span>
+				</button>
+			</li>
+		</template>
+
+		<template id="tpl-output-error">
+			<li>
+				<p class="out-error" role="alert"><span data-bind="text:value"></span></p>
+			</li>
+		</template>
+
+		<template id="tpl-field-number">
+			<label class="field">
+				<span class="field-label" data-ref="label"></span>
+				<input
+					type="number"
+					inputmode="numeric"
+					data-ref="input"
+					data-on="input:change"
+				/>
+				<span class="field-hint" data-ref="hint" hidden></span>
+			</label>
+		</template>
+
+		<template id="tpl-field-text">
+			<label class="field">
+				<span class="field-label" data-ref="label"></span>
+				<input
+					type="text"
+					autocomplete="off"
+					autocapitalize="off"
+					autocorrect="off"
+					spellcheck="false"
+					data-ref="input"
+					data-on="input:change"
+				/>
+				<span class="field-hint" data-ref="hint" hidden></span>
+			</label>
+		</template>
+
+		<template id="tpl-field-datetime">
+			<label class="field">
+				<span class="field-label" data-ref="label"></span>
+				<input type="datetime-local" data-ref="input" data-on="input:change" />
+				<span class="field-hint" data-ref="hint" hidden></span>
+			</label>
+		</template>
+
+		<template id="tpl-field-select">
+			<label class="field">
+				<span class="field-label" data-ref="label"></span>
+				<select data-ref="input" data-on="change:change"></select>
+				<span class="field-hint" data-ref="hint" hidden></span>
+			</label>
+		</template>
+
+		<template id="tpl-field-checkbox">
+			<label class="field field-check">
+				<input type="checkbox" data-ref="input" data-on="change:change" />
+				<span class="field-label" data-ref="label"></span>
+			</label>
+		</template>
+
+		<!-- Build with: deno task example:build  (or example:watch) -->
+		<script type="module" src="./dist/bundle.js"></script>
+	</body>
+</html>

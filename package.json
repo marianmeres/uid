@@ -1,6 +1,6 @@
 {
   "name": "@marianmeres/uid",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "One uid() function, many id strategies: UUID v4/v7, ULID, nanoid-style ids, base56/58/62 and other alphabets, in-memory counters, reversible integer codecs and opt-in human-readable ids. Crypto-backed, zero-dependency core.",
   "license": "MIT",
   "author": "Marian Meres",

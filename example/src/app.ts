@@ -11,7 +11,7 @@
  * snippet, result rows, copy-to-clipboard — is generic.
  *
  * Markup comes from the `<template>`s in index.html; state and wiring come from
- * @marianmeres/vanilla. Build with `deno task example:build`.
+ * @marianmeres/vanilla. Build with `pnpm run example:build`.
  */
 
 import {

@@ -1,0 +1,13 @@
+{
+  "name": "@marianmeres/uid",
+  "exports": {
+    ".": "./src/mod.ts",
+    "./rhr": "./src/rhr.ts"
+  },
+  "imports": {
+    "@marianmeres/random-human-readable": "jsr:@marianmeres/random-human-readable@^1.10.2"
+  },
+  "publish": {
+    "include": ["src/**/*.ts", "README.md", "API.md", "AGENTS.md", "LICENSE"]
+  }
+}

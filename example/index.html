@@ -23,7 +23,7 @@
 			                       reboot bridge. Sets the --app-color-* tokens AND
 			                       the --bs-* variables; light on :root, dark on
 			                       :root.dark. Regenerate (or swap the theme) with:
-			                         deno task example:themes
+			                         pnpm run example:themes
 			  · the block below  — the example's own layout, tokens only, no framework.
 		-->
 		<link rel="stylesheet" href="./reboot.css" />
@@ -421,7 +421,7 @@
 				Built with
 				<a href="https://jsr.io/@marianmeres/vanilla">@marianmeres/vanilla</a>,
 				<a href="https://jsr.io/@marianmeres/design-tokens">design-tokens</a> and
-				<a href="https://jsr.io/@marianmeres/deno-build">deno-build</a>.
+				<a href="https://www.npmjs.com/package/@marianmeres/bundle">bundle</a>.
 			</footer>
 		</main>
 
@@ -533,7 +533,7 @@
 			</label>
 		</template>
 
-		<!-- Build with: deno task example:build  (or example:watch) -->
+		<!-- Build with: pnpm run example:build  (or example:watch) -->
 		<script type="module" src="./dist/bundle.js"></script>
 	</body>
 </html>

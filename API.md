@@ -6,7 +6,7 @@ Complete reference for `@marianmeres/uid`.
 - Opt-in subpath: `@marianmeres/uid/rhr` — the `rhr` function and strategy.
 
 All generators are crypto-backed (`crypto.getRandomValues` / `crypto.randomUUID`)
-and work in browsers, Deno, Node 19+, and Bun. Randomness is good quality but
+and work in browsers, Node 19+ and Deno. Randomness is good quality but
 **not** cryptographically secret — do not use for tokens, keys, or password
 resets.
 

@@ -8,7 +8,8 @@ One `uid()` function, many id strategies — UUIDs, sortable ids (UUID v7 / ULID
 URL-safe random ids (nanoid-style), human-friendly alphabets (base56/58/62/…),
 in-memory counters, reversible integer codecs, and human-readable ids.
 
-- **Works everywhere** — browsers, Deno, Node 19+, Bun.
+- **Works everywhere** — browsers, Node 19+ and Deno (anything with the Web
+  Crypto global).
 - **Crypto-backed** — all randomness comes from the Web Crypto API, with
   rejection sampling so non-power-of-two alphabets stay unbiased.
 - **Zero dependencies** in the core (the optional `rhr` strategy is the only
@@ -22,11 +23,11 @@ in-memory counters, reversible integer codecs, and human-readable ids.
 ## Installation
 
 ```bash
-# deno
-deno add jsr:@marianmeres/uid
+npm install @marianmeres/uid
+```
 
-# npm (or pnpm / yarn / bun)
-npx jsr add @marianmeres/uid
+```bash
+deno add jsr:@marianmeres/uid
 ```
 
 ## Quick start
@@ -181,17 +182,37 @@ options, watch the `uid()` call update to the minimal code that reproduces the
 result, and copy any generated id with one tap. Run it locally with:
 
 ```bash
-deno task example:build   # bundle example/src/app.ts -> example/dist/bundle.js
-deno task example:serve   # http://localhost:8000
+pnpm install
+pnpm run example:build   # bundle example/src/app.ts -> example/dist/bundle.js
+pnpm run example:serve   # http://localhost:8000
 ```
 
-Use `deno task example:watch` while editing, and `deno task example:themes` to
+Use `pnpm run example:watch` while editing, and `pnpm run example:themes` to
 regenerate the stylesheet from a different
-[`@marianmeres/design-tokens`](https://jsr.io/@marianmeres/design-tokens) theme.
+[`@marianmeres/design-tokens`](https://www.npmjs.com/package/@marianmeres/design-tokens)
+theme.
 
 ## API
 
 See [API.md](API.md) for the complete API reference.
+
+## Development
+
+Node LTS (`.node-version`), pnpm, Biome, `node:test`. The source is erasable-only
+TypeScript that Node runs directly; `dist/` is built only for publishing to npm. JSR is
+served the `.ts` source (`jsr.json`).
+
+| Command                             | Does                                                     |
+| ----------------------------------- | -------------------------------------------------------- |
+| `pnpm install`                      | installs the dev tooling                                 |
+| `pnpm test` / `pnpm run test:watch` | `node --test` over `tests/**/*.test.ts`                  |
+| `pnpm run test:deno`                | the same suite on Deno, resolved as JSR consumers see it |
+| `pnpm run typecheck`                | `tsc --noEmit` over `src`, `tests` and `example`         |
+| `pnpm run lint` / `pnpm run format` | `biome check .` read-only / with `--write`               |
+| `pnpm run ci`                       | typecheck + lint + test, what CI runs                    |
+| `pnpm run build`                    | `tsc -p tsconfig.build.json` → `dist/`                   |
+| `pnpm run jsr:check`                | `deno publish --dry-run` with the `package.json` version |
+| `pnpm run rp` / `pnpm run rpm`      | patch / minor release, then publish to npm and JSR       |
 
 ## License
 

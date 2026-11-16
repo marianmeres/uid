@@ -1,85 +1,86 @@
-import { assert, assertEquals, assertMatch, assertThrows } from "@std/assert";
+import assert from "node:assert/strict";
+import { test } from "node:test";
 import { listStrategies, registerStrategy, uid } from "../src/uid.ts";
 import { encodeInt } from "../src/reversible.ts";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
-Deno.test("uid() defaults to uuid v4", () => {
-	assertMatch(uid(), UUID_RE);
+test("uid() defaults to uuid v4", () => {
+	assert.match(uid(), UUID_RE);
 });
 
-Deno.test("uid('uuid') / uid('uuidv4')", () => {
-	assertMatch(uid("uuid"), UUID_RE);
-	assertMatch(uid("uuidv4"), UUID_RE);
+test("uid('uuid') / uid('uuidv4')", () => {
+	assert.match(uid("uuid"), UUID_RE);
+	assert.match(uid("uuidv4"), UUID_RE);
 });
 
-Deno.test("uid('uuidv7') is a valid v7 uuid", () => {
-	assertMatch(
+test("uid('uuidv7') is a valid v7 uuid", () => {
+	assert.match(
 		uid("uuidv7"),
 		/^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
 	);
 });
 
-Deno.test("uid('ulid') is 26 Crockford chars", () => {
-	assertMatch(uid("ulid"), /^[0-9A-HJKMNP-TV-Z]{26}$/);
+test("uid('ulid') is 26 Crockford chars", () => {
+	assert.match(uid("ulid"), /^[0-9A-HJKMNP-TV-Z]{26}$/);
 });
 
-Deno.test("uid('base56') random + reversible-from-uuid", () => {
-	assertEquals(uid("base56", { length: 8 }).length, 8);
+test("uid('base56') random + reversible-from-uuid", () => {
+	assert.deepStrictEqual(uid("base56", { length: 8 }).length, 8);
 	const u = crypto.randomUUID();
-	assertEquals(uid("base56", { uuid: u }).length, 23);
+	assert.deepStrictEqual(uid("base56", { uuid: u }).length, 23);
 });
 
-Deno.test("uid('nanoid') honors length + alphabet", () => {
-	assertEquals(uid("nanoid", { length: 12 }).length, 12);
-	assertMatch(uid("nanoid", { length: 30, alphabet: "ab" }), /^[ab]{30}$/);
+test("uid('nanoid') honors length + alphabet", () => {
+	assert.deepStrictEqual(uid("nanoid", { length: 12 }).length, 12);
+	assert.match(uid("nanoid", { length: 30, alphabet: "ab" }), /^[ab]{30}$/);
 });
 
-Deno.test("uid() alphabet presets", () => {
-	assertMatch(uid("hex", { length: 16 }), /^[0-9a-f]{16}$/);
-	assertMatch(uid("numeric", { length: 6 }), /^[0-9]{6}$/);
-	assertMatch(uid("base62", { length: 10 }), /^[0-9A-Za-z]{10}$/);
-	assertMatch(uid("base58", { length: 10 }), /^[1-9A-HJ-NP-Za-km-z]{10}$/);
+test("uid() alphabet presets", () => {
+	assert.match(uid("hex", { length: 16 }), /^[0-9a-f]{16}$/);
+	assert.match(uid("numeric", { length: 6 }), /^[0-9]{6}$/);
+	assert.match(uid("base62", { length: 10 }), /^[0-9A-Za-z]{10}$/);
+	assert.match(uid("base58", { length: 10 }), /^[1-9A-HJ-NP-Za-km-z]{10}$/);
 });
 
-Deno.test("uid('custom') requires an alphabet", () => {
-	assertMatch(uid("custom", { alphabet: "xyz", length: 5 }), /^[xyz]{5}$/);
+test("uid('custom') requires an alphabet", () => {
+	assert.match(uid("custom", { alphabet: "xyz", length: 5 }), /^[xyz]{5}$/);
 	// deno-lint-ignore no-explicit-any
-	assertThrows(() => uid("custom", {} as any), TypeError, "alphabet");
+	assert.throws(() => uid("custom", {} as any), { name: "TypeError", message: /alphabet/ });
 });
 
-Deno.test("uid('counter') increments per prefix", () => {
+test("uid('counter') increments per prefix", () => {
 	const p = `t${uid("hex", { length: 6 })}_`; // unique prefix per run
-	assertEquals(uid("counter", { prefix: p }), `${p}0`);
-	assertEquals(uid("counter", { prefix: p }), `${p}1`);
+	assert.deepStrictEqual(uid("counter", { prefix: p }), `${p}0`);
+	assert.deepStrictEqual(uid("counter", { prefix: p }), `${p}1`);
 });
 
-Deno.test("uid('reversible') matches encodeInt and requires value", () => {
-	assertEquals(uid("reversible", { value: 12345 }), encodeInt(12345));
-	assertEquals(
+test("uid('reversible') matches encodeInt and requires value", () => {
+	assert.deepStrictEqual(uid("reversible", { value: 12345 }), encodeInt(12345));
+	assert.deepStrictEqual(
 		uid("reversible", { value: 12345, salt: "s" }),
 		encodeInt(12345, { salt: "s" }),
 	);
 	// deno-lint-ignore no-explicit-any
-	assertThrows(() => uid("reversible", {} as any), TypeError, "value");
+	assert.throws(() => uid("reversible", {} as any), { name: "TypeError", message: /value/ });
 });
 
-Deno.test("unknown strategy throws with the available list", () => {
-	assertThrows(() => uid("nope"), Error, "Unknown uid strategy");
+test("unknown strategy throws with the available list", () => {
+	assert.throws(() => uid("nope"), { name: "Error", message: /Unknown uid strategy/ });
 });
 
-Deno.test("registerStrategy adds a custom strategy", () => {
+test("registerStrategy adds a custom strategy", () => {
 	registerStrategy("always-x", () => "x");
-	assertEquals(uid("always-x"), "x");
-	assert(listStrategies().includes("always-x"));
-	assertThrows(
+	assert.deepStrictEqual(uid("always-x"), "x");
+	assert.ok(listStrategies().includes("always-x"));
+	assert.throws(
 		// deno-lint-ignore no-explicit-any
 		() => registerStrategy("", (() => "") as any),
 		TypeError,
 	);
 });
 
-Deno.test("built-in strategies are all registered", () => {
+test("built-in strategies are all registered", () => {
 	const names = listStrategies();
 	for (
 		const n of [
@@ -100,6 +101,6 @@ Deno.test("built-in strategies are all registered", () => {
 			"reversible",
 		]
 	) {
-		assert(names.includes(n), `missing strategy: ${n}`);
+		assert.ok(names.includes(n), `missing strategy: ${n}`);
 	}
 });

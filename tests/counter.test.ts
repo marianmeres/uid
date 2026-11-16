@@ -1,55 +1,56 @@
-import { assertEquals, assertThrows } from "@std/assert";
+import assert from "node:assert/strict";
+import { test } from "node:test";
 import { counter, createCounter, resetCounters } from "../src/counter.ts";
 
-Deno.test("createCounter emits an isolated sequence", () => {
+test("createCounter emits an isolated sequence", () => {
 	const next = createCounter({ prefix: "row-", start: 1, pad: 4 });
-	assertEquals(next(), "row-0001");
-	assertEquals(next(), "row-0002");
-	assertEquals(next(), "row-0003");
+	assert.deepStrictEqual(next(), "row-0001");
+	assert.deepStrictEqual(next(), "row-0002");
+	assert.deepStrictEqual(next(), "row-0003");
 });
 
-Deno.test("createCounter respects start/step", () => {
+test("createCounter respects start/step", () => {
 	const next = createCounter({ start: 10, step: 5 });
-	assertEquals(next(), "10");
-	assertEquals(next(), "15");
-	assertEquals(next(), "20");
+	assert.deepStrictEqual(next(), "10");
+	assert.deepStrictEqual(next(), "15");
+	assert.deepStrictEqual(next(), "20");
 });
 
-Deno.test("createCounter instances are independent", () => {
+test("createCounter instances are independent", () => {
 	const a = createCounter({ prefix: "a" });
 	const b = createCounter({ prefix: "b" });
-	assertEquals(a(), "a0");
-	assertEquals(a(), "a1");
-	assertEquals(b(), "b0");
+	assert.deepStrictEqual(a(), "a0");
+	assert.deepStrictEqual(a(), "a1");
+	assert.deepStrictEqual(b(), "b0");
 });
 
-Deno.test("counter() shares state per prefix", () => {
+test("counter() shares state per prefix", () => {
 	resetCounters("p_");
-	assertEquals(counter({ prefix: "p_" }), "p_0");
-	assertEquals(counter({ prefix: "p_" }), "p_1");
+	assert.deepStrictEqual(counter({ prefix: "p_" }), "p_0");
+	assert.deepStrictEqual(counter({ prefix: "p_" }), "p_1");
 	resetCounters("p_");
-	assertEquals(counter({ prefix: "p_" }), "p_0");
+	assert.deepStrictEqual(counter({ prefix: "p_" }), "p_0");
 });
 
-Deno.test("counter() prefixes are independent", () => {
+test("counter() prefixes are independent", () => {
 	resetCounters();
-	assertEquals(counter({ prefix: "x" }), "x0");
-	assertEquals(counter({ prefix: "y" }), "y0");
-	assertEquals(counter({ prefix: "x" }), "x1");
+	assert.deepStrictEqual(counter({ prefix: "x" }), "x0");
+	assert.deepStrictEqual(counter({ prefix: "y" }), "y0");
+	assert.deepStrictEqual(counter({ prefix: "x" }), "x1");
 });
 
-Deno.test("counter() first call configures; later overrides are ignored", () => {
+test("counter() first call configures; later overrides are ignored", () => {
 	resetCounters("cfg");
-	assertEquals(counter({ prefix: "cfg", step: 1, pad: 3 }), "cfg000");
+	assert.deepStrictEqual(counter({ prefix: "cfg", step: 1, pad: 3 }), "cfg000");
 	// later step/pad overrides for the same prefix are ignored → stable width + step
-	assertEquals(counter({ prefix: "cfg", step: 10, pad: 9 }), "cfg001");
-	assertEquals(counter({ prefix: "cfg", start: 999 }), "cfg002");
+	assert.deepStrictEqual(counter({ prefix: "cfg", step: 10, pad: 9 }), "cfg001");
+	assert.deepStrictEqual(counter({ prefix: "cfg", start: 999 }), "cfg002");
 });
 
-Deno.test("counter validates options", () => {
-	assertThrows(() => counter({ step: 0 }), TypeError, "step");
-	assertThrows(() => counter({ step: 1.5 }), TypeError, "step");
-	assertThrows(() => counter({ start: 1.5 }), TypeError, "start");
+test("counter validates options", () => {
+	assert.throws(() => counter({ step: 0 }), { name: "TypeError", message: /step/ });
+	assert.throws(() => counter({ step: 1.5 }), { name: "TypeError", message: /step/ });
+	assert.throws(() => counter({ start: 1.5 }), { name: "TypeError", message: /start/ });
 	// deno-lint-ignore no-explicit-any
-	assertThrows(() => counter({ prefix: 1 as any }), TypeError, "prefix");
+	assert.throws(() => counter({ prefix: 1 as any }), { name: "TypeError", message: /prefix/ });
 });

@@ -184,7 +184,7 @@ result, and copy any generated id with one tap. Run it locally with:
 ```bash
 pnpm install
 pnpm run example:build   # bundle example/src/app.ts -> example/dist/bundle.js
-pnpm run example:serve   # http://localhost:8000
+pnpm run example:serve   # http://localhost:21440
 ```
 
 Use `pnpm run example:watch` while editing, and `pnpm run example:themes` to

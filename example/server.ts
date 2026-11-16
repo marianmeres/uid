@@ -14,7 +14,8 @@ import { fileURLToPath } from "node:url";
 import { demino } from "@marianmeres/demino";
 import { serve } from "@marianmeres/demino/node";
 
-const PORT = Number(process.env.PORT) || 8000;
+// 21440: the first of the ports reserved for this project (21440-21449)
+const PORT = Number(process.env.PORT) || 21440;
 
 const app = demino("", [], {
 	// one line per request instead of the default's full Request dump

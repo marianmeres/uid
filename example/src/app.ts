@@ -120,7 +120,8 @@ const CARDS: CardSpec[] = [
 	{
 		id: "uuid",
 		title: "uuid",
-		blurb: "RFC 9562 UUID v4 — 122 random bits straight from crypto.randomUUID(). " +
+		blurb:
+			"RFC 9562 UUID v4 — 122 random bits straight from crypto.randomUUID(). " +
 			'The default strategy: uid(), uid("uuid") and uid("uuidv4") are the same call.',
 		fields: [],
 		call: () => ({ strategy: "uuid", options: {} }),
@@ -227,14 +228,16 @@ const CARDS: CardSpec[] = [
 		blurb:
 			"base58 minus 1 and o, so none of 0 O o 1 l I survive. Safe to read aloud over " +
 			"the phone or retype off a printout.",
-		fields: [{
-			name: "length",
-			label: "length",
-			kind: "number",
-			value: 10,
-			min: 1,
-			libraryDefault: 21,
-		}],
+		fields: [
+			{
+				name: "length",
+				label: "length",
+				kind: "number",
+				value: 10,
+				min: 1,
+				libraryDefault: 21,
+			},
+		],
 		call: (v) => ({ strategy: "base56", options: { length: v.length } }),
 		note: `base56: ${ALPHABETS.base56}`,
 	},
@@ -287,8 +290,7 @@ const CARDS: CardSpec[] = [
 			strategy: "custom",
 			options: { alphabet: v.alphabet, length: v.length },
 		}),
-		note:
-			"Clear the alphabet to see the TypeError — options are validated, never coerced.",
+		note: "Clear the alphabet to see the TypeError — options are validated, never coerced.",
 	},
 	{
 		id: "rhr",
@@ -464,7 +466,8 @@ const CARDS: CardSpec[] = [
 		}),
 		meta: (value, call) => `decodeInt() → ${decodeInt(value, call.options)}`,
 		after: (v, set) => set("value", Number(v.value ?? 0) + 1),
-		note: "value auto-increments after each encode, so you can see how little " +
+		note:
+			"value auto-increments after each encode, so you can see how little " +
 			"neighbouring numbers resemble each other.",
 	},
 	{
@@ -536,10 +539,13 @@ function ulidTime(id: string): number {
 function formatTime(ms: number): string {
 	const d = new Date(ms);
 	const p = (n: number, w = 2) => String(n).padStart(w, "0");
-	return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ` +
-		`${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}.${
-			p(d.getMilliseconds(), 3)
-		} local · ${ms}`;
+	return (
+		`${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ` +
+		`${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}.${p(
+			d.getMilliseconds(),
+			3,
+		)} local · ${ms}`
+	);
 }
 
 /**

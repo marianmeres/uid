@@ -42,14 +42,26 @@ test("encodeInt rejects bad values", () => {
 	assert.throws(() => encodeInt(-1), RangeError);
 	assert.throws(() => encodeInt(1.5), RangeError);
 	assert.throws(() => encodeInt(Number.MAX_SAFE_INTEGER + 2), RangeError);
-	assert.throws(() => encodeInt(5, { alphabet: "x" }), { name: "RangeError", message: /alphabet/ });
+	assert.throws(() => encodeInt(5, { alphabet: "x" }), {
+		name: "RangeError",
+		message: /alphabet/,
+	});
 });
 
 test("duplicate alphabet chars are rejected (would corrupt round-trip)", () => {
-	assert.throws(() => encodeInt(5, { alphabet: "aab" }), { name: "RangeError", message: /unique/ });
-	assert.throws(() => decodeInt("ab", { alphabet: "aab" }), { name: "RangeError", message: /unique/ });
+	assert.throws(() => encodeInt(5, { alphabet: "aab" }), {
+		name: "RangeError",
+		message: /unique/,
+	});
+	assert.throws(() => decodeInt("ab", { alphabet: "aab" }), {
+		name: "RangeError",
+		message: /unique/,
+	});
 });
 
 test("decodeInt rejects invalid characters", () => {
-	assert.throws(() => decodeInt("!!!"), { name: "Error", message: /invalid character/ });
+	assert.throws(() => decodeInt("!!!"), {
+		name: "Error",
+		message: /invalid character/,
+	});
 });

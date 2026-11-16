@@ -5,12 +5,12 @@
  * convenience entry point.
  */
 
-import { DEFAULT_LENGTH, randomString } from "./random.ts";
-import { ulid, uuid, uuidv7 } from "./uuid.ts";
-import { base56, uuidToBase56 } from "./base56.ts";
 import { base32, base36, base58, base62, hex, nanoid, numeric } from "./alphabet.ts";
-import { counter, type CounterOptions } from "./counter.ts";
+import { base56, uuidToBase56 } from "./base56.ts";
+import { type CounterOptions, counter } from "./counter.ts";
+import { DEFAULT_LENGTH, randomString } from "./random.ts";
 import { encodeInt } from "./reversible.ts";
+import { ulid, uuid, uuidv7 } from "./uuid.ts";
 
 // ── Per-strategy option types ────────────────────────────────────────────────
 
@@ -214,9 +214,9 @@ export function uid(
 			);
 		}
 		throw new Error(
-			`Unknown uid strategy "${strategy}". Available: ${
-				listStrategies().join(", ")
-			}`,
+			`Unknown uid strategy "${strategy}". Available: ${listStrategies().join(
+				", ",
+			)}`,
 		);
 	}
 	return fn(options);

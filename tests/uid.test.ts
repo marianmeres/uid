@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { listStrategies, registerStrategy, uid } from "../src/uid.ts";
 import { encodeInt } from "../src/reversible.ts";
+import { listStrategies, registerStrategy, uid } from "../src/uid.ts";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
@@ -46,7 +46,10 @@ test("uid() alphabet presets", () => {
 test("uid('custom') requires an alphabet", () => {
 	assert.match(uid("custom", { alphabet: "xyz", length: 5 }), /^[xyz]{5}$/);
 	// deno-lint-ignore no-explicit-any
-	assert.throws(() => uid("custom", {} as any), { name: "TypeError", message: /alphabet/ });
+	assert.throws(() => uid("custom", {} as any), {
+		name: "TypeError",
+		message: /alphabet/,
+	});
 });
 
 test("uid('counter') increments per prefix", () => {
@@ -62,7 +65,10 @@ test("uid('reversible') matches encodeInt and requires value", () => {
 		encodeInt(12345, { salt: "s" }),
 	);
 	// deno-lint-ignore no-explicit-any
-	assert.throws(() => uid("reversible", {} as any), { name: "TypeError", message: /value/ });
+	assert.throws(() => uid("reversible", {} as any), {
+		name: "TypeError",
+		message: /value/,
+	});
 });
 
 test("unknown strategy throws with the available list", () => {
@@ -82,25 +88,23 @@ test("registerStrategy adds a custom strategy", () => {
 
 test("built-in strategies are all registered", () => {
 	const names = listStrategies();
-	for (
-		const n of [
-			"uuid",
-			"uuidv4",
-			"uuidv7",
-			"ulid",
-			"base56",
-			"nanoid",
-			"hex",
-			"base32",
-			"base36",
-			"base58",
-			"base62",
-			"numeric",
-			"custom",
-			"counter",
-			"reversible",
-		]
-	) {
+	for (const n of [
+		"uuid",
+		"uuidv4",
+		"uuidv7",
+		"ulid",
+		"base56",
+		"nanoid",
+		"hex",
+		"base32",
+		"base36",
+		"base58",
+		"base62",
+		"numeric",
+		"custom",
+		"counter",
+		"reversible",
+	]) {
 		assert.ok(names.includes(n), `missing strategy: ${n}`);
 	}
 });

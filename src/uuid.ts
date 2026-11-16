@@ -8,9 +8,9 @@ import { ALPHABETS, randomBytes, randomString } from "./random.ts";
 function bytesToUuid(bytes: Uint8Array): string {
 	let h = "";
 	for (let i = 0; i < 16; i++) h += bytes[i].toString(16).padStart(2, "0");
-	return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${
-		h.slice(20)
-	}`;
+	return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(
+		20,
+	)}`;
 }
 
 /**

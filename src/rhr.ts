@@ -19,7 +19,7 @@
  */
 
 import { getRandomHumanReadable } from "@marianmeres/random-human-readable";
-import { registerStrategy, type RhrOptions } from "./uid.ts";
+import { type RhrOptions, registerStrategy } from "./uid.ts";
 
 /**
  * Generates a random human-readable id (e.g. `"happy-blue-otter-canyon"`).

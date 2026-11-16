@@ -30,10 +30,16 @@ test("randomString is unbiased enough to hit every symbol", () => {
 
 test("randomString rejects bad input", () => {
 	assert.throws(() => randomString(0, "abc"), { name: "TypeError", message: /length/ });
-	assert.throws(() => randomString(1.5, "abc"), { name: "TypeError", message: /length/ });
+	assert.throws(() => randomString(1.5, "abc"), {
+		name: "TypeError",
+		message: /length/,
+	});
 	assert.throws(() => randomString(5, ""), { name: "RangeError", message: /alphabet/ });
 	// deno-lint-ignore no-explicit-any
-	assert.throws(() => randomString(5, 123 as any), { name: "TypeError", message: /alphabet/ });
+	assert.throws(() => randomString(5, 123 as any), {
+		name: "TypeError",
+		message: /alphabet/,
+	});
 });
 
 test("randomBytes length + chunking beyond 65536", () => {

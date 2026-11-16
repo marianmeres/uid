@@ -23,7 +23,10 @@ test("encoded uuid is always 23 chars (fixed width)", () => {
 		assert.deepStrictEqual(uuidToBase56(crypto.randomUUID()).length, 23);
 	}
 	// explicit max-value uuid (all bits set) needs the full 23 chars
-	assert.deepStrictEqual(uuidToBase56("ffffffff-ffff-ffff-ffff-ffffffffffff").length, 23);
+	assert.deepStrictEqual(
+		uuidToBase56("ffffffff-ffff-ffff-ffff-ffffffffffff").length,
+		23,
+	);
 });
 
 test("base56Uuid produces a reversible encoding", () => {

@@ -16,10 +16,10 @@
  * @module
  */
 
-export * from "./random.ts";
-export * from "./uuid.ts";
-export * from "./base56.ts";
 export * from "./alphabet.ts";
+export * from "./base56.ts";
 export * from "./counter.ts";
+export * from "./random.ts";
 export * from "./reversible.ts";
 export * from "./uid.ts";
+export * from "./uuid.ts";

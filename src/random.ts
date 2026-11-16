@@ -55,10 +55,7 @@ export function assertPositiveInt(n: unknown, label: string): asserts n is numbe
 }
 
 /** Throws `TypeError` unless `n` is an integer `>= 0`. */
-export function assertNonNegativeInt(
-	n: unknown,
-	label: string,
-): asserts n is number {
+export function assertNonNegativeInt(n: unknown, label: string): asserts n is number {
 	if (typeof n !== "number" || !Number.isInteger(n) || n < 0) {
 		throw new TypeError(
 			`"${label}" must be a non-negative integer, got ${String(n)}`,
@@ -102,9 +99,7 @@ export function randomString(
 	}
 	const alen = alphabet.length;
 	if (alen < 1 || alen > 256) {
-		throw new RangeError(
-			`"alphabet" length must be between 1 and 256, got ${alen}`,
-		);
+		throw new RangeError(`"alphabet" length must be between 1 and 256, got ${alen}`);
 	}
 	// degenerate single-char alphabet: every position is that char
 	if (alen === 1) return alphabet.repeat(length);

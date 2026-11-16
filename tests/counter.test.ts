@@ -52,5 +52,8 @@ test("counter validates options", () => {
 	assert.throws(() => counter({ step: 1.5 }), { name: "TypeError", message: /step/ });
 	assert.throws(() => counter({ start: 1.5 }), { name: "TypeError", message: /start/ });
 	// deno-lint-ignore no-explicit-any
-	assert.throws(() => counter({ prefix: 1 as any }), { name: "TypeError", message: /prefix/ });
+	assert.throws(() => counter({ prefix: 1 as any }), {
+		name: "TypeError",
+		message: /prefix/,
+	});
 });
